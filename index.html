@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoomMate — Student Accommodation & Roommate Finder</title>
+  <meta name="description" content="Find affordable student rooms, PGs, hostels, and shared accommodations near your college campus with RoomMate.">
+  
+  <!-- Remix Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- STICKY NAVBAR -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="index.html" class="logo">
+        <div class="logo-icon"><i class="ri-home-heart-fill"></i></div>
+        <div>
+          <span>RoomMate</span>
+          <small class="logo-tagline">Find a place. Find your people.</small>
+        </div>
+      </a>
+
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle navigation">
+        <i class="ri-menu-line"></i>
+      </button>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="properties.html" class="nav-link">Find a Room</a>
+        <a href="favourites.html" class="nav-link">Favourites <span id="fav-count-badge" class="fav-badge" style="display:none;">0</span></a>
+        <a href="post-property.html" class="nav-link">Post Property</a>
+        <div id="nav-auth-container" style="display: inline-flex; gap: 0.5rem; align-items: center;">
+          <a href="login.html" class="btn btn-sm btn-outline">Login</a>
+        </div>
+        <a href="post-property.html" class="btn btn-sm btn-primary"><i class="ri-add-line"></i> Post a Property</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-pill">
+            <i class="ri-sparkles-fill"></i> India's #1 Student Accommodation Finder
+          </div>
+          <h1 class="hero-title">Find a place you'll <span>love to call home.</span></h1>
+          <p class="hero-subtitle">Affordable rooms, PGs, hostels, and shared accommodation made specifically for college students.</p>
+
+          <!-- HERO SEARCH BOX -->
+          <form class="search-box" action="properties.html" method="GET">
+            <div class="search-field">
+              <label><i class="ri-map-pin-line"></i> Location</label>
+              <input type="text" name="location" placeholder="e.g. Vashi, Powai, Thane, Andheri">
+            </div>
+            <div class="search-field">
+              <label><i class="ri-wallet-3-line"></i> Max Rent (₹)</label>
+              <select name="maxRent">
+                <option value="">Any Budget</option>
+                <option value="7000">Under ₹7,000</option>
+                <option value="9000">Under ₹9,000</option>
+                <option value="12000">Under ₹12,000</option>
+                <option value="15000">Under ₹15,000</option>
+              </select>
+            </div>
+            <div class="search-field">
+              <label><i class="ri-hotel-bed-line"></i> Stay Type</label>
+              <select name="type">
+                <option value="">All Types</option>
+                <option value="PG">PG (Paying Guest)</option>
+                <option value="Hostel">Hostel</option>
+                <option value="Private Room">Private Room</option>
+                <option value="Shared Room">Shared Room</option>
+                <option value="1BHK">1BHK Apartment</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-lg btn-primary"><i class="ri-search-line"></i> Search Stays</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- POPULAR LOCATIONS -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Popular Student Locations</h2>
+            <p class="section-subtitle">Explore verified student stays near top college campuses and stations.</p>
+          </div>
+          <a href="properties.html" class="btn btn-sm btn-outline">Explore All <i class="ri-arrow-right-line"></i></a>
+        </div>
+
+        <div class="locations-grid">
+          <a href="properties.html?location=Thane" class="location-chip"><i class="ri-building-line"></i> Thane</a>
+          <a href="properties.html?location=Navi+Mumbai" class="location-chip"><i class="ri-map-pin-2-line"></i> Navi Mumbai</a>
+          <a href="properties.html?location=Mumbai" class="location-chip"><i class="ri-government-line"></i> Mumbai</a>
+          <a href="properties.html?location=Powai" class="location-chip"><i class="ri-compass-3-line"></i> Powai</a>
+          <a href="properties.html?location=Andheri" class="location-chip"><i class="ri-subway-line"></i> Andheri</a>
+          <a href="properties.html?location=Vashi" class="location-chip"><i class="ri-community-line"></i> Vashi</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- POPULAR STUDENT STAYS GRID -->
+    <section class="section" style="background-color: #ffffff; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Popular Student Stays</h2>
+            <p class="section-subtitle">Handpicked, student-friendly rooms with verified owners and top amenities.</p>
+          </div>
+          <a href="properties.html" class="btn btn-sm btn-outline">View All 12 Stays <i class="ri-arrow-right-line"></i></a>
+        </div>
+
+        <div class="properties-grid" id="home-featured-grid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY ROOMMATE SECTION -->
+    <section class="section">
+      <div class="container text-center">
+        <div class="hero-pill" style="margin-bottom: 0.8rem;">
+          <i class="ri-shield-star-line"></i> Built For Students, By Students
+        </div>
+        <h2 class="section-title">Why Students Choose RoomMate</h2>
+        <p class="section-subtitle" style="max-width: 600px; margin: 0 auto 2.5rem;">Simplifying housing for college students with zero brokerages, transparent listings, and direct owner connections.</p>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="ri-money-dollar-circle-line"></i></div>
+            <h3 class="feature-title">Student Budget Friendly</h3>
+            <p class="feature-desc">All stays are curated within affordable student price ranges with clear monthly rent and security deposits.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="ri-shield-user-line"></i></div>
+            <h3 class="feature-title">100% Verified Owners</h3>
+            <p class="feature-desc">Direct contact details of verified property owners without dealing with expensive brokers or agents.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="ri-pin-distance-line"></i></div>
+            <h3 class="feature-title">Near Top Colleges</h3>
+            <p class="feature-desc">Filter stays based on proximity to major colleges, metro stations, and public transport hubs.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="ri-heart-pulse-line"></i></div>
+            <h3 class="feature-title">Student Comfort & Safety</h3>
+            <p class="feature-desc">Properties with Wi-Fi, AC, security CCTV, biometric access, and home-cooked meals.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <div class="logo-icon"><i class="ri-home-heart-fill"></i></div>
+            <span>RoomMate</span>
+          </a>
+          <p class="footer-desc">Making student accommodation simpler, transparent, and hassle-free near top college campuses.</p>
+          <div class="social-links">
+            <a href="#" class="social-icon" title="Instagram"><i class="ri-instagram-line"></i></a>
+            <a href="#" class="social-icon" title="LinkedIn"><i class="ri-linkedin-fill"></i></a>
+            <a href="#" class="social-icon" title="Twitter / X"><i class="ri-twitter-x-line"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Explore</h4>
+          <div class="footer-links">
+            <a href="properties.html">Find a Room</a>
+            <a href="properties.html?type=PG">PG Accommodations</a>
+            <a href="properties.html?type=Hostel">Student Hostels</a>
+            <a href="favourites.html">Saved Favourites</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Property Owners</h4>
+          <div class="footer-links">
+            <a href="post-property.html">Post a Property</a>
+            <a href="login.html">Owner Login</a>
+            <a href="signup.html">Register as Owner</a>
+            <a href="dashboard.html">Owner Dashboard</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Contact & Info</h4>
+          <div class="footer-links">
+            <a href="#">About RoomMate</a>
+            <a href="#">College Mini-Project Info</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 RoomMate. All rights reserved. Designed for College Mini-Project.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('home-featured-grid');
+      if (grid) {
+        // Show first 6 popular properties on homepage
+        grid.innerHTML = PROPERTIES_DATA.slice(0, 6).map(p => createPropertyCardHtml(p)).join('');
+      }
+    });
+  </script>
+</body>
+</html>
