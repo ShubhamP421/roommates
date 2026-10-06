@@ -235,6 +235,7 @@ async function fetchPropertiesFromMySQL() {
             responseTime: "Responds within 15 mins"
           }
         }));
+        document.dispatchEvent(new CustomEvent('properties:updated'));
         console.log('✅ Synchronized properties from MySQL database:', PROPERTIES_DATA.length);
       }
     }

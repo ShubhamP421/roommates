@@ -43,7 +43,7 @@
     <div class="search-page-layout">
       
       <!-- MOBILE FILTER TOGGLE BUTTON -->
-      <button class="btn btn-outline mobile-filter-btn" id="mobile-filter-toggle">
+      <button class="btn btn-outline mobile-filter-btn" id="mobile-filter-toggle" aria-expanded="false" aria-controls="filter-sidebar">
         <i class="ri-filter-3-line"></i> Toggle Filters
       </button>
 
@@ -68,6 +68,15 @@
             <span>-</span>
             <input type="number" id="filter-max-rent" placeholder="Max ₹" step="500">
           </div>
+        </div>
+
+        <div class="filter-group">
+          <label class="group-title" for="filter-min-rating">Minimum Rating</label>
+          <select id="filter-min-rating" class="form-control">
+            <option value="0">Any rating</option>
+            <option value="4">4.0 and above</option>
+            <option value="4.5">4.5 and above</option>
+          </select>
         </div>
 
         <!-- Accommodation Type -->
@@ -142,6 +151,10 @@
             <input type="checkbox" id="filter-available"> Immediate Available Only
           </label>
         </div>
+
+        <button type="button" class="btn btn-primary filter-apply-btn" id="apply-filters-btn">
+          <i class="ri-check-line"></i> Apply Filters
+        </button>
       </aside>
 
       <!-- RESULTS PANEL -->

@@ -14,10 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const locationInput = document.getElementById('filter-location');
   const minRentInput = document.getElementById('filter-min-rent');
   const maxRentInput = document.getElementById('filter-max-rent');
+  const minRatingSelect = document.getElementById('filter-min-rating');
   const sortSelect = document.getElementById('sort-select');
   const resultsCountElem = document.getElementById('results-count');
   const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
   const filterSidebar = document.getElementById('filter-sidebar');
+  const applyFiltersBtn = document.getElementById('apply-filters-btn');
 
   // Pre-fill parameters if present
   if (locationInput && paramLocation) locationInput.value = paramLocation;
@@ -30,65 +32,84 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mobile Filter Sidebar Toggle
   if (mobileFilterToggle && filterSidebar) {
     mobileFilterToggle.addEventListener('click', () => {
-      filterSidebar.classList.toggle('mobile-open');
+      const isOpen = filterSidebar.classList.toggle('mobile-open');
+      mobileFilterToggle.setAttribute('aria-expanded', String(isOpen));
     });
   }
 
+  function readFilterState() {
+    const selectedType = document.querySelector('input[name="filter-type"]:checked');
+    const selectedGender = document.querySelector('input[name="filter-gender"]:checked');
+
+    return {
+      location: locationInput ? locationInput.value.trim().toLowerCase() : '',
+      minRent: minRentInput && minRentInput.value ? Number(minRentInput.value) : 0,
+      maxRent: maxRentInput && maxRentInput.value ? Number(maxRentInput.value) : Infinity,
+      type: selectedType ? selectedType.value : 'All',
+      gender: selectedGender ? selectedGender.value : 'Any',
+      minRating: minRatingSelect ? Number(minRatingSelect.value) : 0,
+      facilities: Array.from(document.querySelectorAll('input[name="filter-facility"]:checked')).map(input => input.value),
+      available: Boolean(document.getElementById('filter-available')?.checked),
+      sort: sortSelect ? sortSelect.value : 'recommended'
+    };
+  }
+
+  let appliedFilters = readFilterState();
+
   // Apply filters function
-  function applyFilters() {
+  function applyFilters(filters = appliedFilters) {
     let filtered = [...PROPERTIES_DATA];
 
     // 1. Location Search
-    const locValue = locationInput ? locationInput.value.trim().toLowerCase() : '';
+    const locValue = filters.location;
     if (locValue) {
-      filtered = filtered.filter(p => 
-        p.location.toLowerCase().includes(locValue) ||
-        p.area.toLowerCase().includes(locValue) ||
-        p.city.toLowerCase().includes(locValue) ||
-        p.title.toLowerCase().includes(locValue)
-      );
+      filtered = filtered.filter(p => [
+        p.location, p.area, p.city, p.title, p.description, p.type,
+        ...(Array.isArray(p.facilities) ? p.facilities : [])
+      ].some(value => String(value || '').toLowerCase().includes(locValue)));
     }
 
     // 2. Minimum Rent
-    const minRent = minRentInput && minRentInput.value ? Number(minRentInput.value) : 0;
-    if (minRent > 0) {
-      filtered = filtered.filter(p => p.rent >= minRent);
+    if (filters.minRent > 0) {
+      filtered = filtered.filter(p => p.rent >= filters.minRent);
     }
 
     // 3. Maximum Rent
-    const maxRent = maxRentInput && maxRentInput.value ? Number(maxRentInput.value) : Infinity;
-    if (maxRent < Infinity && maxRent > 0) {
-      filtered = filtered.filter(p => p.rent <= maxRent);
+    if (filters.maxRent < Infinity && filters.maxRent > 0) {
+      filtered = filtered.filter(p => p.rent <= filters.maxRent);
     }
 
     // 4. Accommodation Type
-    const selectedType = document.querySelector('input[name="filter-type"]:checked');
-    if (selectedType && selectedType.value !== 'All') {
-      filtered = filtered.filter(p => p.type.toLowerCase() === selectedType.value.toLowerCase());
+    if (filters.type !== 'All') {
+      filtered = filtered.filter(p => String(p.type || '').toLowerCase() === filters.type.toLowerCase());
     }
 
     // 5. Gender Preference
-    const selectedGender = document.querySelector('input[name="filter-gender"]:checked');
-    if (selectedGender && selectedGender.value !== 'Any') {
-      filtered = filtered.filter(p => p.gender === 'Any' || p.gender.toLowerCase() === selectedGender.value.toLowerCase());
+    if (filters.gender !== 'Any') {
+      filtered = filtered.filter(p => {
+        const gender = String(p.gender || p.gender_preference || 'Any').toLowerCase();
+        return gender === 'any' || gender === filters.gender.toLowerCase();
+      });
+    }
+
+    if (filters.minRating > 0) {
+      filtered = filtered.filter(p => Number(p.rating) >= filters.minRating);
     }
 
     // 6. Facilities (Must include all checked facilities)
-    const checkedFacilities = Array.from(document.querySelectorAll('input[name="filter-facility"]:checked')).map(c => c.value);
-    if (checkedFacilities.length > 0) {
+    if (filters.facilities.length > 0) {
       filtered = filtered.filter(p => 
-        checkedFacilities.every(fac => p.facilities.includes(fac))
+        filters.facilities.every(fac => Array.isArray(p.facilities) && p.facilities.includes(fac))
       );
     }
 
     // 7. Availability Filter
-    const availableOnlyCheckbox = document.getElementById('filter-available');
-    if (availableOnlyCheckbox && availableOnlyCheckbox.checked) {
+    if (filters.available) {
       filtered = filtered.filter(p => p.available);
     }
 
     // 8. Sorting
-    const sortVal = sortSelect ? sortSelect.value : 'recommended';
+    const sortVal = filters.sort;
     if (sortVal === 'price-low') {
       filtered.sort((a, b) => a.rent - b.rent);
     } else if (sortVal === 'price-high') {
@@ -121,24 +142,24 @@ document.addEventListener('DOMContentLoaded', () => {
     propertiesGrid.innerHTML = properties.map(p => createPropertyCardHtml(p)).join('');
   }
 
-  // Attach event listeners to all filter inputs
-  if (locationInput) locationInput.addEventListener('input', applyFilters);
-  if (minRentInput) minRentInput.addEventListener('input', applyFilters);
-  if (maxRentInput) maxRentInput.addEventListener('input', applyFilters);
-  if (sortSelect) sortSelect.addEventListener('change', applyFilters);
-
-  document.querySelectorAll('input[name="filter-type"]').forEach(r => r.addEventListener('change', applyFilters));
-  document.querySelectorAll('input[name="filter-gender"]').forEach(r => r.addEventListener('change', applyFilters));
-  document.querySelectorAll('input[name="filter-facility"]').forEach(c => c.addEventListener('change', applyFilters));
+  if (applyFiltersBtn) {
+    applyFiltersBtn.addEventListener('click', () => {
+      appliedFilters = readFilterState();
+      applyFilters(appliedFilters);
+      filterSidebar?.classList.remove('mobile-open');
+      mobileFilterToggle?.setAttribute('aria-expanded', 'false');
+    });
+  }
 
   const availChk = document.getElementById('filter-available');
-  if (availChk) availChk.addEventListener('change', applyFilters);
+  document.addEventListener('properties:updated', () => applyFilters(appliedFilters));
 
   // Global reset helper
   window.resetAllFilters = function() {
     if (locationInput) locationInput.value = '';
     if (minRentInput) minRentInput.value = '';
     if (maxRentInput) maxRentInput.value = '';
+    if (minRatingSelect) minRatingSelect.value = '0';
     
     const defaultType = document.querySelector('input[name="filter-type"][value="All"]');
     if (defaultType) defaultType.checked = true;
@@ -150,12 +171,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (availChk) availChk.checked = false;
     if (sortSelect) sortSelect.value = 'recommended';
 
-    applyFilters();
+    appliedFilters = readFilterState();
+    applyFilters(appliedFilters);
   };
 
   const resetBtn = document.getElementById('reset-filters-btn');
   if (resetBtn) resetBtn.addEventListener('click', window.resetAllFilters);
 
   // Initial Filter Run
-  applyFilters();
+  applyFilters(appliedFilters);
 });
